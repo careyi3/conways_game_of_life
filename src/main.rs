@@ -4,7 +4,7 @@ use std::{thread, time};
 
 fn main() {
     let mut grid: HashMap<String, i32> = Default::default();
-    let print_area = 80;
+    let print_area = 60;
     grid = seed_grid(print_area, grid);
     print(print_area, &grid);
 
