@@ -9,18 +9,14 @@ fn main() {
 
     let mut generation = 0;
     loop {
-        let mut new_grid: HashMap<String, i32> = Default::default();
-        let keys: Vec<&String> = grid.keys().collect();
+        let mut new_grid: HashMap<(i32, i32), i32> = Default::default();
+        let keys: Vec<&(i32, i32)> = grid.keys().collect();
 
         for key in keys {
             let val = grid[key];
-            let xy: Vec<i32> = key
-                .split(":")
-                .map(|k| k.to_string().parse::<i32>().unwrap())
-                .collect();
-            let (x, y) = (xy[0], xy[1]);
+            let (x, y) = key;
             let mut population = 0;
-            let nb_coords = neighbour_coords(x, y);
+            let nb_coords = neighbour_coords(*x, *y);
             for coord in &nb_coords {
                 if grid.contains_key(coord) {
                     population += grid[coord];
@@ -58,15 +54,15 @@ fn main() {
     }
 }
 
-fn seed_grid(print_area: i32) -> HashMap<String, i32> {
-    let mut grid: HashMap<String, i32> = Default::default();
+fn seed_grid(print_area: i32) -> HashMap<(i32, i32), i32> {
+    let mut grid: HashMap<(i32, i32), i32> = Default::default();
     for _ in 0..35 {
         let x = rand::thread_rng().gen_range(print_area / 4..print_area - (print_area / 4));
         let y = rand::thread_rng().gen_range(print_area / 4..print_area - (print_area / 4));
 
-        grid.insert(format!("{}:{}", x, y), 1);
-        grid.insert(format!("{}:{}", x, y + 1), 1);
-        grid.insert(format!("{}:{}", x + 1, y), 1);
+        grid.insert((x, y), 1);
+        grid.insert((x, y + 1), 1);
+        grid.insert((x + 1, y), 1);
 
         for coord in neighbour_coords(x, y) {
             if !grid.contains_key(&coord) {
@@ -89,24 +85,24 @@ fn seed_grid(print_area: i32) -> HashMap<String, i32> {
     return grid;
 }
 
-fn neighbour_coords(x: i32, y: i32) -> Vec<String> {
-    let mut coords: Vec<String> = vec![];
-    coords.push(format!("{}:{}", x + 1, y));
-    coords.push(format!("{}:{}", x, y + 1));
-    coords.push(format!("{}:{}", x + 1, y + 1));
-    coords.push(format!("{}:{}", x - 1, y - 1));
-    coords.push(format!("{}:{}", x - 1, y));
-    coords.push(format!("{}:{}", x, y - 1));
-    coords.push(format!("{}:{}", x + 1, y - 1));
-    coords.push(format!("{}:{}", x - 1, y + 1));
+fn neighbour_coords(x: i32, y: i32) -> Vec<(i32, i32)> {
+    let mut coords: Vec<(i32, i32)> = vec![];
+    coords.push((x + 1, y));
+    coords.push((x, y + 1));
+    coords.push((x + 1, y + 1));
+    coords.push((x - 1, y - 1));
+    coords.push((x - 1, y));
+    coords.push((x, y - 1));
+    coords.push((x + 1, y - 1));
+    coords.push((x - 1, y + 1));
     return coords;
 }
 
-fn print(print_area: i32, grid: &HashMap<String, i32>) {
+fn print(print_area: i32, grid: &HashMap<(i32, i32), i32>) {
     for y in 0..print_area {
         let mut points: Vec<String> = vec![];
         for x in 0..print_area {
-            let key = format!("{x}:{y}");
+            let key = (x, y);
             if !grid.contains_key(&key) || grid[&key] == 0 {
                 points.push('.'.to_string());
             } else {
